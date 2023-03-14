@@ -38,3 +38,5 @@ IVC *vc_read_image(char *filename);
 int vc_write_image(char *filename, IVC *image);
 int vc_gray_negative(IVC* srcdst);
 int vc_rgb_negative(IVC* srcdst);
+int vc_rgb_to_gray(IVC* src, IVC* dst);
+int vc_rgb_to_hsv(IVC* src, IVC *dst);
