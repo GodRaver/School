@@ -443,7 +443,10 @@ int vc_rgb_to_gray(IVC *src, IVC *dst)
 		{
 			pos_src = y*bytesperline_src + x*channels_src;
 			pos_dst = y*bytesperline_dst + x*channels_dst;
-
+			while(x < 2)
+			{
+				printf("%ld", pos_src);
+			}
 			rf = (float) datasrc[pos_src];
 			gf = (float) datasrc[pos_src+1];
 			bf = (float) datasrc[pos_src+2];
@@ -458,13 +461,66 @@ int vc_rgb_to_gray(IVC *src, IVC *dst)
 	return 1;
 }
 
-int vc_rgb_to_hsv(IVC* src, IVC *dst)
+
+int vc_rgb_to_hsv(IVC *src, IVC *dst)
 {
-	
+	unsigned char *datasrc = (unsigned char*) src->data;
+	int bytesperline_src = src->width *src->channels;
+	int channels_src = src->channels;
+	unsigned char* datadst = (unsigned char*) dst->data;
+	int bytesperline_dst = dst->width *dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+	int height = src->height;
+	int x,y;
+	long int pos_src, pos_dst;
+	float hue, valor, saturacao;
+
+
+	if((src->width <= 0) || (src->height <= 0) || (src->data == NULL)) return 0;
+	if((src->width != dst->width) || (src->height != dst->height)) return 0;
+	if((src->channels != 3) || (dst->channels != 3)) return 0;
+
+	for(y = 0; y < height; y++)
+	{
+		for(x=0; x< width; x++)
+		{
+			pos_src = y*bytesperline_src + x*channels_src;
+			pos_dst = y*bytesperline_dst + x*channels_dst;
+
+			if(datasrc[pos_src] > datasrc[pos_src+1] && datasrc[pos_src+2])
+			{
+				valor = datasrc[pos_src];
+			}
+			else if (datasrc[pos_src+1] > datasrc[pos_src+2] && datasrc[pos_src])
+			{
+				valor = datasrc[pos_src+1];
+			}
+			else
+			{
+				valor = datasrc[pos_src+2];
+			}
+			if(datasrc[pos_src] < datasrc[pos_src+1] && datasrc[pos_src+2])
+			{
+				saturacao = datasrc[pos_src];
+			}
+			else if (datasrc[pos_src+1] < datasrc[pos_src+2] && datasrc[pos_src])
+			{
+				saturacao = datasrc[pos_src+1];
+			}
+			else
+			{
+				saturacao = datasrc[pos_src+2];
+			}			
+		}
 
 
 
+	}
+
+	return 1;
 }
+
 
 
 
