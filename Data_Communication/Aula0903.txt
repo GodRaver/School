@@ -1,0 +1,18 @@
+Exercicios
+
+a) Qual função do campo "Source Port" e "Destination Port" em relação à camada de transporte?
+
+Source Port -> Porta de origem
+Destination Port -> Porta de destino
+
+b)Qual função do campo "Flags" em relação a característica da camada de transporte?
+
+A função do campo "Flags" serve para a informar a entidade recetora qual a ação a realizar
+
+c)Qual o numero do próximo segmento esperado após este segmento? Justifique sua resposta
+
+O número do próximo segmento esperado é de 5142 pois está indicado no Next sequence number : 5142
+
+d)Qual o número de marcação desde segmento? Justifique sua resposta
+
+Sequence number atual é 4141, como indica no Sequence Number: 4141
