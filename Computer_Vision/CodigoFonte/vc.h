@@ -9,6 +9,7 @@
 
 
 #define VC_DEBUG
+#include <math.h>
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -40,3 +41,4 @@ int vc_gray_negative(IVC* srcdst);
 int vc_rgb_negative(IVC* srcdst);
 int vc_rgb_to_gray(IVC* src, IVC* dst);
 int vc_rgb_to_hsv(IVC* src, IVC *dst);
+int vc_hsv_segmentation(IVC*src, IVC*dst, int hmin,int hmax, int smin, int smax, int vmax, int vmin);

@@ -1,39 +1,37 @@
 #include "../vc.h"
 #include <stdio.h>
+#include <math.h>
 
 
 int main()
 {
-    IVC *image;
+    IVC *image, *image2;
     int x, y;
     long int pos;
 
-    image = vc_image_new( 320, 280, 1, 1 );
+    image = vc_read_image("ImagensHSV/HSVTestImage01.ppm");
     if (image == NULL)
     {
         printf("ERROR -> vc_image_new():\n\tOut of memory!\n");
         getchar();
         return 0;
     }
+    image2 = vc_image_new(image->width,image->height,1,image->levels);
 
-    for ( x = 0; x < image->width; x++)
-    {
-        for ( y = 0; y < image->height; y++)
-        {
-            pos = y * image->bytesperline + x * image->channels;
+    vc_rgb_to_hsv(image,image2);
 
-            if ((x <= image->width/2) && (y <= image->height/2)) image->data[pos]=1;
-            else if ((x > image->width/2) && (y > image->height/2)) image->data[pos]=1;
-            else image->data[pos] = 0;
+    
 
-        }
-    }
-        vc_write_image("teste.pbm", image);
-        vc_image_free(image);
 
-        printf("Press any key to exit...\n");
-        getchar();
-        return 0;
+    
+    vc_write_image("teste.ppm", image2);
+    vc_image_free(image2);
+    vc_image_free(image);
+
+    
+    printf("Press any key to exit...\n");
+    getchar();
+    return 0;
 
 
 }

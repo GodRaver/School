@@ -15,6 +15,7 @@
 #include <string.h>
 #include <malloc.h>
 #include "vc.h"
+#include <math.h>
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -461,67 +462,115 @@ int vc_rgb_to_gray(IVC *src, IVC *dst)
 	return 1;
 }
 
-
+//Converte imagem de rgb para hsv
 int vc_rgb_to_hsv(IVC *src, IVC *dst)
 {
-	unsigned char *datasrc = (unsigned char*) src->data;
-	int bytesperline_src = src->width *src->channels;
-	int channels_src = src->channels;
-	unsigned char* datadst = (unsigned char*) dst->data;
-	int bytesperline_dst = dst->width *dst->channels;
+    unsigned char *data = (unsigned char *) src->data;
+    int bytesperline = src->width * src->channels;
+    int channels = src->channels;
+	unsigned char *datadst = (unsigned char *) dst->data;
+	int bytesperlinedst = dst->width * dst->channels;
 	int channels_dst = dst->channels;
 	int width = src->width;
-	int height = src->height;
-	int x,y;
-	long int pos_src, pos_dst;
-	float hue, valor, saturacao;
+    int height = src->height;
+    int x, y;
+    long int pos, pos_dst;
+	float MAX = 0; 	//Valor Máximo
+	float V;		//Valor
+	float MIN = 0; 	//Valor Mínimo
+	float S = 0;  	//Valor Saturação
+	float H = 0; 	//Componente Matiz
 
+	//Atribuir dimensões para segunda imagem
+	//dst->width = width;
+	//dst->height = height;
 
-	if((src->width <= 0) || (src->height <= 0) || (src->data == NULL)) return 0;
-	if((src->width != dst->width) || (src->height != dst->height)) return 0;
-	if((src->channels != 3) || (dst->channels != 3)) return 0;
+    //Verificação de erros
+    if ((src->width <=0) || (src->height <= 0) || (src->data == NULL)) return 0;
+	if ((src->width != dst->width) || (src->height != dst->height)) return 0;
+	if ((src->channels != 3) || (dst->channels != 3)) return 0;
 
-	for(y = 0; y < height; y++)
+	for (y = 0; y < height; y++)
 	{
-		for(x=0; x< width; x++)
+		for (x = 0; x < width; x++)
 		{
-			pos_src = y*bytesperline_src + x*channels_src;
-			pos_dst = y*bytesperline_dst + x*channels_dst;
 
-			if(datasrc[pos_src] > datasrc[pos_src+1] && datasrc[pos_src+2])
+			pos = y * bytesperline + x * channels;
+			pos_dst = y * bytesperlinedst + x * channels_dst;
+			MAX = data[pos];
+			MIN = data[pos];
+
+
+			//Verificar maior das três componentes RGB
+			if (data[pos + 1] > MAX )
 			{
-				valor = datasrc[pos_src];
+				MAX = data[pos + 1];
 			}
-			else if (datasrc[pos_src+1] > datasrc[pos_src+2] && datasrc[pos_src])
+
+			if (data[pos + 2] > MAX)
 			{
-				valor = datasrc[pos_src+1];
+				MAX = data[pos + 2];
 			}
-			else
+
+			//Atribuir Valor	
+			V = MAX;
+			// Verificar menor das Três componentes RGB
+			if (data[pos + 1] < MIN )
 			{
-				valor = datasrc[pos_src+2];
+				MIN = data[pos + 1];
 			}
-			if(datasrc[pos_src] < datasrc[pos_src+1] && datasrc[pos_src+2])
+
+			if (data[pos + 2] < MIN)
 			{
-				saturacao = datasrc[pos_src];
+				MIN = data[pos + 2];
 			}
-			else if (datasrc[pos_src+1] < datasrc[pos_src+2] && datasrc[pos_src])
+
+			if (V == 0 || MAX == MIN)
 			{
-				saturacao = datasrc[pos_src+1];
+				S = 0;
+				H = 0;
+			} else
+			{
+				S = (MAX - MIN) / V;
+				if (MAX == data[pos] && data[pos + 1] >= data[pos + 2])
+				{
+					H = 60 * (data[pos + 1] - data[pos + 2]) / (MAX - MIN);
+				} else if (MAX == data[pos] && data[pos + 2] > data[pos + 1])
+				{
+					H = 360 + 60 * (data[pos + 1] - data[pos + 2]) / (MAX - MIN);
+				} else if (MAX  == data[pos + 1])
+				{
+					H = 120 + 60 * (data[pos + 2] - data[pos]) / (MAX - MIN);
+				} else if (MAX == data[pos + 2])
+				{
+					H = 240 + 60 * (data[pos] - data[pos + 1]) / (MAX - MIN);
+				}
 			}
-			else
-			{
-				saturacao = datasrc[pos_src+2];
-			}			
+
+			datadst[pos_dst] = (unsigned char)(H / 2);
+			datadst[pos_dst + 1] = (unsigned char)(S * 255);
+			datadst[pos_dst + 2] = V;
 		}
-
-
-
 	}
 
-	return 1;
+    return 1;
 }
 
 
+int vc_hsv_segmentation(IVC*src, IVC*dst, int hmin,int hmax, int smin, int smax, int vmax, int vmin)
+{
+	unsigned char *data = (unsigned char *) src->data;
+    int bytesperline = src->width * src->channels;
+    int channels = src->channels;
+	unsigned char *datadst = (unsigned char *) dst->data;
+	int bytesperlinedst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+    int height = src->height;
+    int x, y;
+    long int pos, pos_dst;
+
+	
 
 
 
@@ -529,3 +578,26 @@ int vc_rgb_to_hsv(IVC *src, IVC *dst)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
