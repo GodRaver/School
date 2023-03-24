@@ -188,6 +188,125 @@ void bit_to_unsigned_char(unsigned char *databit, unsigned char *datauchar, int 
 }
 
 
+/*IVC *vc_read_image(char *filename)
+{
+	FILE *file = NULL;
+	IVC *image = NULL;
+	unsigned char *tmp;
+	char tok[20];
+	long int size, sizeofbinarydata;
+	int width, height, channels;
+	int levels = 255;
+	int v;
+	
+	// Abre o ficheiro
+	if((file = fopen(filename, "rb")) != NULL)
+	{
+		// Efectua a leitura do header
+		netpbm_get_token(file, tok, sizeof(tok));
+
+		if(strcmp(tok, "P4") == 0) { channels = 1; levels = 1; }	// Se PBM (Binary [0,1])
+		else if(strcmp(tok, "P5") == 0) channels = 1;				// Se PGM (Gray [0,MAX(level,255)])
+		else if(strcmp(tok, "P6") == 0) channels = 3;				// Se PPM (RGB [0,MAX(level,255)])
+		else
+		{
+			#ifdef VC_DEBUG
+			printf("ERROR -> vc_read_image():\n\tFile is not a valid PBM, PGM or PPM file.\n\tBad magic number!\n");
+			#endif
+
+			fclose(file);
+			return NULL;
+		}
+		
+		if(levels == 1) // PBM
+		{
+			if(sscanf(netpbm_get_token(file, tok, sizeof(tok)), "%d", &width) != 1 || 
+			   sscanf(netpbm_get_token(file, tok, sizeof(tok)), "%d", &height) != 1)
+			{
+				#ifdef VC_DEBUG
+				printf("ERROR -> vc_read_image():\n\tFile is not a valid PBM file.\n\tBad size!\n");
+				#endif
+
+				fclose(file);
+				return NULL;
+			}
+
+			// Aloca mem�ria para imagem
+			image = vc_image_new(width, height, channels, levels);
+			if(image == NULL) return NULL;
+
+			sizeofbinarydata = (image->width / 8 + ((image->width % 8) ? 1 : 0)) * image->height;
+			tmp = (unsigned char *) malloc(sizeofbinarydata);
+			if(tmp == NULL) return 0;
+
+			#ifdef VC_DEBUG
+			printf("\nchannels=%d w=%d h=%d levels=%d\n", image->channels, image->width, image->height, levels);
+			#endif
+
+			if((v = fread(tmp, sizeof(unsigned char), sizeofbinarydata, file)) != sizeofbinarydata)
+			{
+				#ifdef VC_DEBUG
+				printf("ERROR -> vc_read_image():\n\tPremature EOF on file.\n");
+				#endif
+
+				vc_image_free(image);
+				fclose(file);
+				free(tmp);
+				return NULL;
+			}
+
+			bit_to_unsigned_char(tmp, image->data, image->width, image->height);
+
+			free(tmp);
+		}
+		else // PGM ou PPM
+		{
+			if(sscanf(netpbm_get_token(file, tok, sizeof(tok)), "%d", &width) != 1 || 
+			   sscanf(netpbm_get_token(file, tok, sizeof(tok)), "%d", &height) != 1 || 
+			   sscanf(netpbm_get_token(file, tok, sizeof(tok)), "%d", &levels) != 1 || levels <= 0 || levels > 255)
+			{
+				#ifdef VC_DEBUG
+				printf("ERROR -> vc_read_image():\n\tFile is not a valid PGM or PPM file.\n\tBad size!\n");
+				#endif
+
+				fclose(file);
+				return NULL;
+			}
+
+			// Aloca mem�ria para imagem
+			image = vc_image_new(width, height, channels, levels);
+			if(image == NULL) return NULL;
+
+			#ifdef VC_DEBUG
+			printf("\nchannels=%d w=%d h=%d levels=%d\n", image->channels, image->width, image->height, levels);
+			#endif
+
+			size = image->width * image->height * image->channels;
+
+			if((v = fread(image->data, sizeof(unsigned char), size, file)) != size)
+			{
+				#ifdef VC_DEBUG
+				printf("ERROR -> vc_read_image():\n\tPremature EOF on file.\n");
+				#endif
+
+				vc_image_free(image);
+				fclose(file);
+				return NULL;
+			}
+		}
+		
+		fclose(file);
+	}
+	else
+	{
+		#ifdef VC_DEBUG
+		printf("ERROR -> vc_read_image():\n\tFile not found.\n");
+		#endif
+	}
+	
+	return image;
+}
+*/
 IVC *vc_read_image(char *filename)
 {
 	FILE *file = NULL;
@@ -306,6 +425,7 @@ IVC *vc_read_image(char *filename)
 	
 	return image;
 }
+
 
 
 int vc_write_image(char *filename, IVC *image)
@@ -599,5 +719,86 @@ int vc_hsv_segmentation(IVC*src, IVC*dst, int hmin,int hmax, int smin, int smax,
 
 
 
+
+}
+
+int vc_scale_gray_to_rgb(IVC* src, IVC* dst)
+{
+	unsigned char *data = (unsigned char *) src->data;
+    int bytesperline = src->width * src->channels;
+    int channels = src->channels;
+	unsigned char *datadst = (unsigned char *) dst->data;
+	int bytesperlinedst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+    int height = src->height;
+    int x, y;
+    long int pos, pos_dst;
+
+
+	if((src->width <= 0) || (src->height <= 0) || (src->data == NULL)) return 0;
+	if((src->width != dst->width) || (src->height != dst->height)) return 0;
+	if((src->channels != 1) || (dst->channels != 3)) return 0;
+
+	for(y=0; y<height;y++)
+	{
+		for(x=0; x<width; x++)
+		{
+			pos = y * bytesperline + x * channels;
+			pos_dst = y * bytesperlinedst + x * channels_dst;
+
+
+			if(data[pos] < 64)
+			{
+				datadst[pos_dst] = 0;
+				datadst[pos_dst+1] = data[pos]*4;
+				datadst[pos_dst+2] = 255;
+			}
+
+			else if(data[pos] < 128)
+			{
+				datadst[pos_dst] = 0;
+				datadst[pos_dst+1] = 255;
+				datadst[pos_dst+2] = 255-((data[pos]-64)*4);
+			}
+			else if(data[pos]< 192)
+			{
+				datadst[pos_dst] = ((data[pos]-128)*4);
+				datadst[pos_dst+1] = 255;
+				datadst[pos_dst+2] = 0;
+			}
+			else
+			{
+				datadst[pos_dst] = 255;
+				datadst[pos_dst+1] = 255 -((data[pos]-64)*4);
+				datadst[pos_dst+2] = 0;
+			}
+		}
+	}
+	return 0;
+
+}
+
+
+int vc_gray_to_binary(IVC *srcdst, int threshold)
+{
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+int vc_gray_to_binary_global_mean(IVC *srcdst)
+{
 
 }
