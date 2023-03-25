@@ -43,5 +43,5 @@ int vc_rgb_to_gray(IVC* src, IVC* dst);
 int vc_rgb_to_hsv(IVC* src, IVC *dst);
 int vc_hsv_segmentation(IVC*src, IVC*dst, int hmin,int hmax, int smin, int smax, int vmax, int vmin);
 int vc_scale_gray_to_rgb(IVC* src, IVC* dst);
-int vc_gray_to_binary_global_mean(IVC *srcdst);
-int vc_gray_to_binary(IVC *srcdst, int threshold);
+int vc_gray_to_binary_global_mean(IVC *src,IVC *dst);
+int vc_gray_to_binary(IVC *src,IVC *dst, int threshold);
