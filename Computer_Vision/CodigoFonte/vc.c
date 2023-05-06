@@ -720,7 +720,7 @@ int vc_gray_to_binary_global_mean(IVC *src,IVC *dst)
     int height = src->height;
     int x, y;
     long int pos, pos_dst;
-	float media;
+	float media=0;
 
 
 
@@ -765,16 +765,275 @@ int vc_gray_to_binary_global_mean(IVC *src,IVC *dst)
 		}	
 	}
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
+int vc_gray_to_binary_automatic_binary(IVC *src, IVC *dst)
+{
+    unsigned char *data = (unsigned char *)src->data;
+    int bytesperline = src->width * src->channels;
+    int channels = src->channels;
+    unsigned char *datadst = (unsigned char *)dst->data;
+    int bytesperlinedst = dst->width * dst->channels;
+    int channels_dst = dst->channels;
+    int width = src->width;
+    int height = src->height;
+    int x, y, i, j;
+    long int pos, pos_dst;
+    int Vmax, Vmin;
+    int threshold;
+    int neighbor_size = 25;
+    int half_neighbor = neighbor_size / 2;
+
+    if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+        return 0;
+    if ((src->width != dst->width) || (src->height != dst->height))
+        return 0;
+    if ((src->channels != 1) || (dst->channels != 1))
+        return 0;
+
+    // Thresholding using T = (1/2) * (Vmax + Vmin) for each neighborhood
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            Vmax = 0;
+            Vmin = 255;
+
+            // Finding Vmax and Vmin in the neighborhood
+            for (i = -half_neighbor; i <= half_neighbor; i++)
+            {
+                for (j = -half_neighbor; j <= half_neighbor; j++)
+                {
+                    int cur_x = x + j;
+                    int cur_y = y + i;
+
+                    // Check if coordinates are within the image bounds
+                    if (cur_x >= 0 && cur_x < width && cur_y >= 0 && cur_y < height)
+                    {
+                        pos = cur_y * bytesperline + cur_x * channels;
+                        if (data[pos] > Vmax)
+                            Vmax = data[pos];
+                        if (data[pos] < Vmin)
+                            Vmin = data[pos];
+                    }
+                }
+            }
+
+            // Calculate threshold for the current neighborhood
+            threshold = (Vmax + Vmin) / 2;
+
+            pos = y * bytesperline + x * channels;
+            pos_dst = y * bytesperlinedst + x * channels_dst;
+
+            if (data[pos] < threshold)
+                datadst[pos_dst] = 0;
+            else
+                datadst[pos_dst] = 255;
+        }
+    }
+
+    return 1;
+}
+
+
+int vc_gray_to_binary_automatic_binary_bernsen(IVC *src, IVC *dst)
+{
+    unsigned char *data = (unsigned char *)src->data;
+    int bytesperline = src->width * src->channels;
+    int channels = src->channels;
+    unsigned char *datadst = (unsigned char *)dst->data;
+    int bytesperlinedst = dst->width * dst->channels;
+    int channels_dst = dst->channels;
+    int width = src->width;
+    int height = src->height;
+    int x, y, i, j;
+    long int pos, pos_dst;
+    int Vmax, Vmin;
+	int threshold;
+    int neighbor_size = 25;
+    int half_neighbor = neighbor_size / 2;
+    int Cmin = 15;
+
+    if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+        return 0;
+    if ((src->width != dst->width) || (src->height != dst->height))
+        return 0;
+    if ((src->channels != 1) || (dst->channels != 1))
+        return 0;
+
+    // Thresholding using Bernsen's method for each neighborhood
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            Vmax = 0;
+            Vmin = 255;
+
+            // Finding Vmax and Vmin in the neighborhood
+            for (i = -half_neighbor; i <= half_neighbor; i++)
+            {
+                for (j = -half_neighbor; j <= half_neighbor; j++)
+                {
+                    int cur_x = x + j;
+                    int cur_y = y + i;
+
+                    // Check if coordinates are within the image bounds
+                    if (cur_x >= 0 && cur_x < width && cur_y >= 0 && cur_y < height)
+                    {
+                        pos = cur_y * bytesperline + cur_x * channels;
+                        if (data[pos] > Vmax)
+                            Vmax = data[pos];
+                        if (data[pos] < Vmin)
+                            Vmin = data[pos];
+                    }
+                }
+            }
+
+            // Calculate threshold for the current neighborhood using Bernsen's method
+            if ((Vmax - Vmin) < 15)
+                threshold = 122;
+            else
+                threshold = (Vmax + Vmin) / 2;
+
+            pos = y * bytesperline + x * channels;
+            pos_dst = y * bytesperlinedst + x * channels_dst;
+
+            if (data[pos] < threshold)
+                datadst[pos_dst] = 0;
+            else
+                datadst[pos_dst] = 255;
+        }
+    }
+
+    return 1;
+}
+
+int vc_binary_erode(IVC *src, IVC *dst, int size)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x, y;
+	int xk, yk;
+	int i, j;
+	long int pos, posk;
+	int s1, s2;
+	unsigned char pixel;
+
+	// Verificação de erros
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL)) return 0;
+	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels)) return 0;
+	if (channels != 1) return 0;
+
+	s2 = (size - 1) / 2;
+	s1 = -(s2);
+
+	memcpy(datadst, datasrc, bytesperline * height);
+
+	// Cálculo da erosão
+	for (y = 0; y<height; y++)
+	{
+		for (x = 0; x<width; x++)
+		{
+			pos = y * bytesperline + x * channels;
+
+			pixel = datasrc[pos];
+
+			for (yk = s1; yk <= s2; yk++)
+			{
+				j = y + yk;
+
+				if ((j < 0) || (j >= height)) continue;
+
+				for (xk = s1; xk <= s2; xk++)
+				{
+					i = x + xk;
+
+					if ((i < 0) || (i >= width)) continue;
+
+					posk = j * bytesperline + i * channels;
+
+					pixel &= datasrc[posk];
+				}
+			}
+
+			// Se um qualquer pixel da vizinhança, na imagem de origem, for de plano de fundo, então o pixel central
+			// na imagem de destino é também definido como plano de fundo.
+			if (pixel == 0) datadst[pos] = 0;
+		}
+	}
+
+	return 1;
+}
+
+int vc_binary_dilate(IVC *src, IVC *dst, int kernel)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x, y;
+	int xk, yk;
+	int i, j;
+	long int pos, posk;
+	int s1, s2;
+	unsigned char pixel;
+
+	// Verificação de erros
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL)) return 0;
+	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels)) return 0;
+	if (channels != 1) return 0;
+
+	s2 = (kernel - 1) / 2;
+	s1 = -(s2);
+
+	memcpy(datadst, datasrc, bytesperline * height);
+
+	// Cálculo da erosão
+	for (y = 0; y<height; y++)
+	{
+		for (x = 0; x<width; x++)
+		{
+			pos = y * bytesperline + x * channels;
+
+			pixel = datasrc[pos];
+
+			for (yk = s1; yk <= s2; yk++)
+			{
+				j = y + yk;
+
+				if ((j < 0) || (j >= height)) continue;
+
+				for (xk = s1; xk <= s2; xk++)
+				{
+					i = x + xk;
+
+					if ((i < 0) || (i >= width)) continue;
+
+					posk = j * bytesperline + i * channels;
+
+					pixel &= datasrc[posk];
+				}
+			}
+
+			// Se um qualquer pixel da vizinhança, na imagem de origem, for de plano de fundo, então o pixel central
+			// na imagem de destino é também definido como plano de fundo.
+			if (pixel == 0) datadst[pos] = 0;
+		}
+	}
+
+	return 1;
+}
+
+
+
+
+
+
+
+
+
