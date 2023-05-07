@@ -16,6 +16,14 @@
 //                   ESTRUTURA DE UMA IMAGEM
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+typedef struct {
+	int x, y, width, height;	// Caixa Delimitadora (Bounding Box)
+	int area;					// �rea
+	int xc, yc;					// Centro-de-massa
+	int perimeter;				// Per�metro
+	int label;					// Etiqueta
+} OVC;
+
 
 typedef struct {
 	unsigned char *data;
@@ -49,3 +57,5 @@ int vc_gray_to_binary_automatic_binary(IVC *src, IVC *dst);
 int vc_gray_to_binary_automatic_binary_bernsen(IVC *src, IVC *dst);
 int vc_binary_erode(IVC *src, IVC *dst, int size);
 int vc_binary_dilate(IVC *src, IVC *dst, int kernel);
+OVC* vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels);
+int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs);
