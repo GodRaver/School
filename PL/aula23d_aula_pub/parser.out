@@ -1,0 +1,400 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> S
+Rule 1     S -> LstV ;
+Rule 2     LstV -> LstV ; Inst
+Rule 3     LstV -> Inst
+Rule 4     Inst -> escrever string
+Rule 5     Inst -> V
+Rule 6     Inst -> escrever E
+Rule 7     V -> varid = E
+Rule 8     E -> E + E
+Rule 9     E -> E - E
+Rule 10    E -> E * E
+Rule 11    E -> - E
+Rule 12    E -> ( E )
+Rule 13    E -> num
+Rule 14    E -> varid
+
+Terminals, with rules where they appear
+
+(                    : 12
+)                    : 12
+*                    : 10
++                    : 8
+-                    : 9 11
+;                    : 1 2
+=                    : 7
+error                : 
+escrever             : 4 6
+num                  : 13
+string               : 4
+varid                : 7 14
+
+Nonterminals, with rules where they appear
+
+E                    : 6 7 8 8 9 9 10 10 11 12
+Inst                 : 2 3
+LstV                 : 1 2
+S                    : 0
+V                    : 5
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . S
+    (1) S -> . LstV ;
+    (2) LstV -> . LstV ; Inst
+    (3) LstV -> . Inst
+    (4) Inst -> . escrever string
+    (5) Inst -> . V
+    (6) Inst -> . escrever E
+    (7) V -> . varid = E
+
+    escrever        shift and go to state 4
+    varid           shift and go to state 6
+
+    S                              shift and go to state 1
+    LstV                           shift and go to state 2
+    Inst                           shift and go to state 3
+    V                              shift and go to state 5
+
+state 1
+
+    (0) S' -> S .
+
+
+
+state 2
+
+    (1) S -> LstV . ;
+    (2) LstV -> LstV . ; Inst
+
+    ;               shift and go to state 7
+
+
+state 3
+
+    (3) LstV -> Inst .
+
+    ;               reduce using rule 3 (LstV -> Inst .)
+
+
+state 4
+
+    (4) Inst -> escrever . string
+    (6) Inst -> escrever . E
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    string          shift and go to state 8
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 9
+
+state 5
+
+    (5) Inst -> V .
+
+    ;               reduce using rule 5 (Inst -> V .)
+
+
+state 6
+
+    (7) V -> varid . = E
+
+    =               shift and go to state 14
+
+
+state 7
+
+    (1) S -> LstV ; .
+    (2) LstV -> LstV ; . Inst
+    (4) Inst -> . escrever string
+    (5) Inst -> . V
+    (6) Inst -> . escrever E
+    (7) V -> . varid = E
+
+    $end            reduce using rule 1 (S -> LstV ; .)
+    escrever        shift and go to state 4
+    varid           shift and go to state 6
+
+    Inst                           shift and go to state 15
+    V                              shift and go to state 5
+
+state 8
+
+    (4) Inst -> escrever string .
+
+    ;               reduce using rule 4 (Inst -> escrever string .)
+
+
+state 9
+
+    (6) Inst -> escrever E .
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    ;               reduce using rule 6 (Inst -> escrever E .)
+    +               shift and go to state 16
+    -               shift and go to state 17
+    *               shift and go to state 18
+
+
+state 10
+
+    (11) E -> - . E
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 19
+
+state 11
+
+    (12) E -> ( . E )
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 20
+
+state 12
+
+    (13) E -> num .
+
+    +               reduce using rule 13 (E -> num .)
+    -               reduce using rule 13 (E -> num .)
+    *               reduce using rule 13 (E -> num .)
+    ;               reduce using rule 13 (E -> num .)
+    )               reduce using rule 13 (E -> num .)
+
+
+state 13
+
+    (14) E -> varid .
+
+    +               reduce using rule 14 (E -> varid .)
+    -               reduce using rule 14 (E -> varid .)
+    *               reduce using rule 14 (E -> varid .)
+    ;               reduce using rule 14 (E -> varid .)
+    )               reduce using rule 14 (E -> varid .)
+
+
+state 14
+
+    (7) V -> varid = . E
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 21
+
+state 15
+
+    (2) LstV -> LstV ; Inst .
+
+    ;               reduce using rule 2 (LstV -> LstV ; Inst .)
+
+
+state 16
+
+    (8) E -> E + . E
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 22
+
+state 17
+
+    (9) E -> E - . E
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 23
+
+state 18
+
+    (10) E -> E * . E
+    (8) E -> . E + E
+    (9) E -> . E - E
+    (10) E -> . E * E
+    (11) E -> . - E
+    (12) E -> . ( E )
+    (13) E -> . num
+    (14) E -> . varid
+
+    -               shift and go to state 10
+    (               shift and go to state 11
+    num             shift and go to state 12
+    varid           shift and go to state 13
+
+    E                              shift and go to state 24
+
+state 19
+
+    (11) E -> - E .
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    +               reduce using rule 11 (E -> - E .)
+    -               reduce using rule 11 (E -> - E .)
+    *               reduce using rule 11 (E -> - E .)
+    ;               reduce using rule 11 (E -> - E .)
+    )               reduce using rule 11 (E -> - E .)
+
+  ! +               [ shift and go to state 16 ]
+  ! -               [ shift and go to state 17 ]
+  ! *               [ shift and go to state 18 ]
+
+
+state 20
+
+    (12) E -> ( E . )
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    )               shift and go to state 25
+    +               shift and go to state 16
+    -               shift and go to state 17
+    *               shift and go to state 18
+
+
+state 21
+
+    (7) V -> varid = E .
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    ;               reduce using rule 7 (V -> varid = E .)
+    +               shift and go to state 16
+    -               shift and go to state 17
+    *               shift and go to state 18
+
+
+state 22
+
+    (8) E -> E + E .
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    +               reduce using rule 8 (E -> E + E .)
+    -               reduce using rule 8 (E -> E + E .)
+    ;               reduce using rule 8 (E -> E + E .)
+    )               reduce using rule 8 (E -> E + E .)
+    *               shift and go to state 18
+
+  ! *               [ reduce using rule 8 (E -> E + E .) ]
+  ! +               [ shift and go to state 16 ]
+  ! -               [ shift and go to state 17 ]
+
+
+state 23
+
+    (9) E -> E - E .
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    +               reduce using rule 9 (E -> E - E .)
+    -               reduce using rule 9 (E -> E - E .)
+    ;               reduce using rule 9 (E -> E - E .)
+    )               reduce using rule 9 (E -> E - E .)
+    *               shift and go to state 18
+
+  ! *               [ reduce using rule 9 (E -> E - E .) ]
+  ! +               [ shift and go to state 16 ]
+  ! -               [ shift and go to state 17 ]
+
+
+state 24
+
+    (10) E -> E * E .
+    (8) E -> E . + E
+    (9) E -> E . - E
+    (10) E -> E . * E
+
+    +               reduce using rule 10 (E -> E * E .)
+    -               reduce using rule 10 (E -> E * E .)
+    *               reduce using rule 10 (E -> E * E .)
+    ;               reduce using rule 10 (E -> E * E .)
+    )               reduce using rule 10 (E -> E * E .)
+
+  ! +               [ shift and go to state 16 ]
+  ! -               [ shift and go to state 17 ]
+  ! *               [ shift and go to state 18 ]
+
+
+state 25
+
+    (12) E -> ( E ) .
+
+    +               reduce using rule 12 (E -> ( E ) .)
+    -               reduce using rule 12 (E -> ( E ) .)
+    *               reduce using rule 12 (E -> ( E ) .)
+    ;               reduce using rule 12 (E -> ( E ) .)
+    )               reduce using rule 12 (E -> ( E ) .)
+
