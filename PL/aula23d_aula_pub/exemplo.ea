@@ -1,1 +1,4 @@
-ESCREVER "Gosto de comer coisas";ESCREVER 2*4*2;POR = 10;
+VAR x = 5;
+VAR y = 3;
+VAR z = x + y;
+PRINT "The value of z is:", z;

@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = "left+-left*rightsimetricoescrever num string varid S : LstV ';'  LstV :  LstV ';' Inst  LstV :  Inst Inst :  escrever string Inst : V   Inst :  escrever E   V : varid '=' E  E : E '+' E  \n              | E '-' E \n              | E '*' E  E : '-' E   %prec simetrico  E : '(' E ')'  E :  num   E :  varid  "
+_lr_signature = 'ADD ASSIGN COMMA DIV ID LPAREN MUL NUM PRINT RPAREN SEMICOLON STRING SUB VARprogram : statement_liststatement_list : statement\n                      | statement_list statementstatement : variable_declaration\n                 | assignment\n                 | write_instructionvariable_declaration : VAR ID ASSIGN expression SEMICOLONassignment : ID ASSIGN expression SEMICOLONwrite_instruction : PRINT expression_list SEMICOLONexpression_list : expression\n                       | expression_list COMMA expressionexpression : ID\n                  | NUM\n                  | STRING\n                  | LPAREN expression RPAREN\n                  | expression ADD expression\n                  | expression SUB expression\n                  | expression MUL expression\n                  | expression DIV expression'
     
-_lr_action_items = {'escrever':([0,7,],[4,4,]),'varid':([0,4,7,10,11,14,16,17,18,],[6,13,6,13,13,13,13,13,13,]),'$end':([1,7,],[0,-1,]),';':([2,3,5,8,9,12,13,15,19,21,22,23,24,25,],[7,-3,-5,-4,-6,-13,-14,-2,-11,-7,-8,-9,-10,-12,]),'string':([4,],[8,]),'-':([4,9,10,11,12,13,14,16,17,18,19,20,21,22,23,24,25,],[10,17,10,10,-13,-14,10,10,10,10,-11,17,17,-8,-9,-10,-12,]),'(':([4,10,11,14,16,17,18,],[11,11,11,11,11,11,11,]),'num':([4,10,11,14,16,17,18,],[12,12,12,12,12,12,12,]),'=':([6,],[14,]),'+':([9,12,13,19,20,21,22,23,24,25,],[16,-13,-14,-11,16,16,-8,-9,-10,-12,]),'*':([9,12,13,19,20,21,22,23,24,25,],[18,-13,-14,-11,18,18,18,18,-10,-12,]),')':([12,13,19,20,22,23,24,25,],[-13,-14,-11,25,-8,-9,-10,-12,]),}
+_lr_action_items = {'VAR':([0,2,3,4,5,6,10,21,29,36,],[7,7,-2,-4,-5,-6,-3,-9,-8,-7,]),'ID':([0,2,3,4,5,6,7,9,10,12,18,19,21,22,23,24,25,26,29,36,],[8,8,-2,-4,-5,-6,11,15,-3,15,15,15,-9,15,15,15,15,15,-8,-7,]),'PRINT':([0,2,3,4,5,6,10,21,29,36,],[9,9,-2,-4,-5,-6,-3,-9,-8,-7,]),'$end':([1,2,3,4,5,6,10,21,29,36,],[0,-1,-2,-4,-5,-6,-3,-9,-8,-7,]),'ASSIGN':([8,11,],[12,19,]),'NUM':([9,12,18,19,22,23,24,25,26,],[16,16,16,16,16,16,16,16,16,]),'STRING':([9,12,18,19,22,23,24,25,26,],[17,17,17,17,17,17,17,17,17,]),'LPAREN':([9,12,18,19,22,23,24,25,26,],[18,18,18,18,18,18,18,18,18,]),'SEMICOLON':([13,14,15,16,17,20,28,30,31,32,33,34,35,],[21,-10,-12,-13,-14,29,36,-11,-16,-17,-18,-19,-15,]),'COMMA':([13,14,15,16,17,30,31,32,33,34,35,],[22,-10,-12,-13,-14,-11,-16,-17,-18,-19,-15,]),'ADD':([14,15,16,17,20,27,28,30,31,32,33,34,35,],[23,-12,-13,-14,23,23,23,23,23,23,23,23,-15,]),'SUB':([14,15,16,17,20,27,28,30,31,32,33,34,35,],[24,-12,-13,-14,24,24,24,24,24,24,24,24,-15,]),'MUL':([14,15,16,17,20,27,28,30,31,32,33,34,35,],[25,-12,-13,-14,25,25,25,25,25,25,25,25,-15,]),'DIV':([14,15,16,17,20,27,28,30,31,32,33,34,35,],[26,-12,-13,-14,26,26,26,26,26,26,26,26,-15,]),'RPAREN':([15,16,17,27,31,32,33,34,35,],[-12,-13,-14,35,-16,-17,-18,-19,-15,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'S':([0,],[1,]),'LstV':([0,],[2,]),'Inst':([0,7,],[3,15,]),'V':([0,7,],[5,5,]),'E':([4,10,11,14,16,17,18,],[9,19,20,21,22,23,24,]),}
+_lr_goto_items = {'program':([0,],[1,]),'statement_list':([0,],[2,]),'statement':([0,2,],[3,10,]),'variable_declaration':([0,2,],[4,4,]),'assignment':([0,2,],[5,5,]),'write_instruction':([0,2,],[6,6,]),'expression_list':([9,],[13,]),'expression':([9,12,18,19,22,23,24,25,26,],[14,20,27,28,30,31,32,33,34,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,19 +26,24 @@ for _k, _v in _lr_goto_items.items():
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [
-  ("S' -> S","S'",1,None,None,None),
-  ('S -> LstV ;','S',2,'p_s','arith_grammar.py',29),
-  ('LstV -> LstV ; Inst','LstV',3,'p_expr_tail','arith_grammar.py',33),
-  ('LstV -> Inst','LstV',1,'p_expr_head','arith_grammar.py',39),
-  ('Inst -> escrever string','Inst',2,'p_expr_inst_esc_string','arith_grammar.py',43),
-  ('Inst -> V','Inst',1,'p_expr_inst_atr','arith_grammar.py',47),
-  ('Inst -> escrever E','Inst',2,'p_expr_inst_esc','arith_grammar.py',51),
-  ('V -> varid = E','V',3,'p_expr_atrib','arith_grammar.py',55),
-  ('E -> E + E','E',3,'p_expr_op','arith_grammar.py',59),
-  ('E -> E - E','E',3,'p_expr_op','arith_grammar.py',60),
-  ('E -> E * E','E',3,'p_expr_op','arith_grammar.py',61),
-  ('E -> - E','E',2,'p_expr_sinalmenos','arith_grammar.py',66),
-  ('E -> ( E )','E',3,'p_expr_pare','arith_grammar.py',70),
-  ('E -> num','E',1,'p_expr_num','arith_grammar.py',74),
-  ('E -> varid','E',1,'p_expr_var','arith_grammar.py',78),
+  ("S' -> program","S'",1,None,None,None),
+  ('program -> statement_list','program',1,'p_program','arith_grammar.py',64),
+  ('statement_list -> statement','statement_list',1,'p_statement_list','arith_grammar.py',68),
+  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','arith_grammar.py',69),
+  ('statement -> variable_declaration','statement',1,'p_statement','arith_grammar.py',76),
+  ('statement -> assignment','statement',1,'p_statement','arith_grammar.py',77),
+  ('statement -> write_instruction','statement',1,'p_statement','arith_grammar.py',78),
+  ('variable_declaration -> VAR ID ASSIGN expression SEMICOLON','variable_declaration',5,'p_variable_declaration','arith_grammar.py',82),
+  ('assignment -> ID ASSIGN expression SEMICOLON','assignment',4,'p_assignment','arith_grammar.py',86),
+  ('write_instruction -> PRINT expression_list SEMICOLON','write_instruction',3,'p_write_instruction','arith_grammar.py',90),
+  ('expression_list -> expression','expression_list',1,'p_expression_list','arith_grammar.py',94),
+  ('expression_list -> expression_list COMMA expression','expression_list',3,'p_expression_list','arith_grammar.py',95),
+  ('expression -> ID','expression',1,'p_expression','arith_grammar.py',102),
+  ('expression -> NUM','expression',1,'p_expression','arith_grammar.py',103),
+  ('expression -> STRING','expression',1,'p_expression','arith_grammar.py',104),
+  ('expression -> LPAREN expression RPAREN','expression',3,'p_expression','arith_grammar.py',105),
+  ('expression -> expression ADD expression','expression',3,'p_expression','arith_grammar.py',106),
+  ('expression -> expression SUB expression','expression',3,'p_expression','arith_grammar.py',107),
+  ('expression -> expression MUL expression','expression',3,'p_expression','arith_grammar.py',108),
+  ('expression -> expression DIV expression','expression',3,'p_expression','arith_grammar.py',109),
 ]
